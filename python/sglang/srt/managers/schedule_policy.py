@@ -326,6 +326,8 @@ class PrefillAdder:
 
         self.log_hit_tokens += prefix_len
         self.log_input_tokens += extend_input_len
+        #添加，输出log_hit_tokens和log_input_tokens
+        #print(f"prefill_one_req: log_hit_tokens={self.log_hit_tokens}, log_input_tokens={self.log_input_tokens}")
 
     def add_being_chunked_req(self, req: Req):
         truncated = req.extend_input_len > self.rem_chunk_tokens

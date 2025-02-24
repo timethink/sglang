@@ -231,8 +231,22 @@ class MHATokenToKVPool(BaseTokenToKVPool):
         v_size_bytes = 0
         for v_cache in self.v_buffer:
             v_size_bytes += np.prod(v_cache.shape) * v_cache.dtype.itemsize
+        
+        #打印shape和itemsize
+        #print(f"shape:{k_cache.shape}, itemsize:{k_cache.dtype.itemsize}")
+        #print(f"shape:{v_cache.shape}, itemsize:{v_cache.dtype.itemsize}")
         return k_size_bytes, v_size_bytes
     
+    #添加，计算已经使用的kv_cache的大小
+    def get_actual_kv_cache_size(self, index: torch.Tensor):
+        k_size_bytes = 0
+        for k_cache in self.k_buffer:
+            k_size_bytes += np.prod(k_cache[index].shape) * k_cache[index].dtype.itemsize
+        v_size_bytes = 0
+        for v_cache in self.v_buffer:
+            v_size_bytes += np.prod(v_cache[index].shape) * v_cache[index].dtype.itemsize
+        return k_size_bytes, v_size_bytes
+
     
 
     # Todo: different memory layout

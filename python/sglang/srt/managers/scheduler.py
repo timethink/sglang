@@ -790,6 +790,9 @@ class Scheduler:
             f"#queue-req: {len(self.waiting_queue) + has_being_chunked}"
         )
         """
+        current_batch_cache_hit_rate = 100.0 * adder.log_hit_tokens / (adder.log_input_tokens + adder.log_hit_tokens)
+        #这里的cache_hit_rate是累计的多个Batch的cache hit rate
+        #我们添加一个单个Batch的cache hit rate,即current_batch_cache_hit_rate
         #将信息保存到/workspace/Super_MARIO/cache_info.txt文件中
         with open("/workspace/Super_MARIO/cache_info.txt", "a") as f:
             f.write(
@@ -797,7 +800,8 @@ class Scheduler:
                 f"#new-seq: {len(can_run_list)}, "
                 f"#new-token: {adder.log_input_tokens}, "
                 f"#cached-token: {adder.log_hit_tokens}, "
-                f"cache hit rate: {100.0 * tree_cache_hit_rate:.2f}%, "
+                f"total cache hit rate: {100.0 * tree_cache_hit_rate:.2f}%, "
+                f"current batch cache hit rate: {current_batch_cache_hit_rate:.2f}%, "
                 f"token usage: {num_used / self.max_total_num_tokens:.2f}, "
                 f"#running-req: {running_bs}, "
                 f"#queue-req: {len(self.waiting_queue) + has_being_chunked}\n"
@@ -807,10 +811,20 @@ class Scheduler:
                 f.write(f"Req: {req.rid}, input_text: {req.origin_input_text}, input_ids:{req.origin_input_ids}, input_len:{len(req.origin_input_ids)}, prefix_indices: {req.prefix_indices}, prefix_len: {len(req.prefix_indices)}\n")
             f.write("\n")
 
+        #统计req中的最大fill_ids,并保存到/workspace/Super_MARIO/max_fill_ids.txt文件中
+        max_fill_ids = 0
+        for req in can_run_list:
+            if len(req.fill_ids) > max_fill_ids:
+                max_fill_ids = len(req.fill_ids)
+        with open("/workspace/Super_MARIO/max_fill_ids.txt", "a") as f:
+            f.write(str(max_fill_ids) + "\n")
 
         #将cache hit rate保存到/workspace/Super_MARIO/cache_hit_rate.txt文件中
         with open("/workspace/Super_MARIO/cache_hit_rate.txt", "a") as f:
             f.write(str(100.0 * tree_cache_hit_rate) + "\n")
+        #将current_batch_cache_hit_rate保存到/workspace/Super_MARIO/current_batch_cache_hit_rate.txt文件中
+        with open("/workspace/Super_MARIO/current_batch_cache_hit_rate.txt", "a") as f:
+            f.write(str(current_batch_cache_hit_rate) + "\n")
 
         if self.enable_metrics:
             self.stats.num_running_reqs = running_bs

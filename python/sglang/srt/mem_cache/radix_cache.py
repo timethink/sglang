@@ -28,6 +28,10 @@ import torch
 
 from sglang.srt.mem_cache.base_prefix_cache import BasePrefixCache
 from sglang.srt.mem_cache.memory_pool import BaseTokenToKVPool, ReqToTokenPool
+#添加
+from transformers import AutoTokenizer
+
+
 
 if TYPE_CHECKING:
     from sglang.srt.managers.schedule_batch import Req
@@ -191,6 +195,7 @@ class RadixCache(BasePrefixCache):
         #添加，将内容输出到到/workspace/Super_MARIO/tree_cache.txt文件中
         with open('/workspace/Super_MARIO/tree_cache.txt', 'a') as f:
             f.write(f"total_size: {self.total_size()}\n")
+            f.write("\n")
         #添加，计算KVcache的大小
         kv_size = self.total_size() * 30 * 4096 * 4 / 1024 / 1024 / 1024
         with open('/workspace/Super_MARIO/tree_cache.txt', 'a') as f:
@@ -334,9 +339,14 @@ class RadixCache(BasePrefixCache):
     def _print_helper(self, node: TreeNode, indent: int):
         for _, child in node.children.items():
             #添加，将内容输出到到/workspace/Super_MARIO/tree_cache.txt文件中
+            #从/workspace/AlphaMath-7B获取tokenizer，讲key转换为字符串
+            # 替换为模型的实际名称或路径
+            tokenizer = AutoTokenizer.from_pretrained("/workspace/AlphaMath-7B")
+            key_str = tokenizer.decode(child.key)
             with open('/workspace/Super_MARIO/tree_cache.txt', 'a') as f:
                 #f.write(" " * indent + str(len(child.key)) + " " + str(child.key[:10]) + " " + str(child.lock_ref) + "\n")
-                f.write(" " * indent + str(len(child.key)) + " " + str(child.key) + " " + str(len(child.value)) + " " +str(child.value) + " " + str(child.lock_ref) + "\n")
+                f.write(" " * indent + str(len(child.key))  + " " + key_str + " " + str(child.lock_ref) + "\n")
+                #f.write(" " * indent + str(len(child.key)) + " " + str(child.key) + " " + str(len(child.value)) + " " +str(child.value) + " " + str(child.lock_ref) + "\n")
             #print(" " * indent, len(child.key), child.key[:10], f"r={child.lock_ref}")
             self._print_helper(child, indent=indent + 2)
 
