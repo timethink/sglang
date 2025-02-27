@@ -391,7 +391,8 @@ class TokenizerManager:
                 input_ids,
                 sampling_params,
             )
-
+        #添加，用于调试
+        #print(f"tokenized_obj={tokenized_obj}")
         return tokenized_obj
 
     def _send_one_request(
@@ -460,7 +461,8 @@ class TokenizerManager:
         created_time: Optional[float] = None,
     ):
         batch_size = obj.batch_size
-
+        #添加，用于调试
+        #print(f"obj={obj}")
         generators = []
         rids = []
         if getattr(obj, "parallel_sample_num", 1) == 1:
@@ -512,6 +514,7 @@ class TokenizerManager:
         if not is_stream:
             outputs = await asyncio.gather(*(gen.__anext__() for gen in generators))
             yield outputs
+            
         else:
             rid_to_index = {rid: i for i, rid in enumerate(rids)}
             task_map = {asyncio.create_task(gen.__anext__()): gen for gen in generators}

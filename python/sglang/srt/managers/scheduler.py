@@ -100,6 +100,9 @@ from sglang.srt.utils import (
 )
 from sglang.utils import TypeBasedDispatcher, get_exception_traceback
 
+#添加
+from transformers import AutoTokenizer
+
 logger = logging.getLogger(__name__)
 
 # Test retract decode for debugging purposes
@@ -766,7 +769,7 @@ class Scheduler:
         #将self.tree_cache.pretty_print()输出到/workspace/Super_MARIO/tree_cache.txt文件中
         #with open("/workspace/Super_MARIO/tree_cache.txt", "a") as f:
         #    f.write(self.tree_cache.pretty_print())
-        self.tree_cache.pretty_print()
+        #self.tree_cache.pretty_print()
 
         logger.info(
             f"Prefill batch. "
@@ -794,6 +797,7 @@ class Scheduler:
         #这里的cache_hit_rate是累计的多个Batch的cache hit rate
         #我们添加一个单个Batch的cache hit rate,即current_batch_cache_hit_rate
         #将信息保存到/workspace/Super_MARIO/cache_info.txt文件中
+        """
         with open("/workspace/Super_MARIO/cache_info.txt", "a") as f:
             f.write(
                 f"Prefill batch. "
@@ -808,7 +812,10 @@ class Scheduler:
             )
             #将can_run_list中的Req信息写入文件
             for req in can_run_list:
-                f.write(f"Req: {req.rid}, input_text: {req.origin_input_text}, input_ids:{req.origin_input_ids}, input_len:{len(req.origin_input_ids)}, prefix_indices: {req.prefix_indices}, prefix_len: {len(req.prefix_indices)}\n")
+                tokenizer = AutoTokenizer.from_pretrained("/workspace/AlphaMath-7B")
+                #取input_ids的前prefix_len个token，转化为文本
+                prefix_text = tokenizer.decode(req.origin_input_ids[:len(req.prefix_indices)])
+                f.write(f"Req: {req.rid}, input_text: {req.origin_input_text}, input_ids:{req.origin_input_ids}, input_len:{len(req.origin_input_ids)}, prefix_indices: {req.prefix_indices}, prefix_len: {len(req.prefix_indices)}, prefix_text: {prefix_text}\n")
             f.write("\n")
 
         #统计req中的最大fill_ids,并保存到/workspace/Super_MARIO/max_fill_ids.txt文件中
@@ -816,9 +823,12 @@ class Scheduler:
         for req in can_run_list:
             if len(req.fill_ids) > max_fill_ids:
                 max_fill_ids = len(req.fill_ids)
+        #kv_size = self.total_size() * 30 * 4096 * 4 / 1024 / 1024 / 1024
+        kv_size = max_fill_ids * 30 * 4096 * 4 / 1024 / 1024 / 1024
+        gpu_memory_utilization = (13.22 + kv_size) / 80.0
         with open("/workspace/Super_MARIO/max_fill_ids.txt", "a") as f:
-            f.write(str(max_fill_ids) + "\n")
-
+            f.write(f"max_fill_ids: {max_fill_ids}, kv_size: {kv_size:.2f}GB, gpu_memory_utilization: {gpu_memory_utilization}\n")
+        """
         #将cache hit rate保存到/workspace/Super_MARIO/cache_hit_rate.txt文件中
         with open("/workspace/Super_MARIO/cache_hit_rate.txt", "a") as f:
             f.write(str(100.0 * tree_cache_hit_rate) + "\n")
@@ -950,11 +960,13 @@ class Scheduler:
             self.move_ready_grammar_requests()
 
         #将waiting_queue中的请求的text保存到文件中
+        """
         with open("/workspace/Super_MARIO/waiting_queue.txt", "a") as f:
             for req in self.waiting_queue:
                 f.write(req.rid + ": " + req.origin_input_text + "\n")
                 f.write("prefix indices: " + str(req.prefix_indices) + "\n")
                 f.write("cached tokens: " + str(req.cached_tokens) + "\n")
+        """
         # Handle the cases where prefill is not allowed
         if (
             self.batch_is_full or len(self.waiting_queue) == 0

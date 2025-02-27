@@ -193,20 +193,20 @@ class RadixCache(BasePrefixCache):
     def pretty_print(self):
         self._print_helper(self.root_node, 0)
         #添加，将内容输出到到/workspace/Super_MARIO/tree_cache.txt文件中
-        with open('/workspace/Super_MARIO/tree_cache.txt', 'a') as f:
-            f.write(f"total_size: {self.total_size()}\n")
-            f.write("\n")
+        #with open('/workspace/Super_MARIO/tree_cache.txt', 'a') as f:
+        #    f.write(f"total_size: {self.total_size()}\n")
+        #    f.write("\n")
         #添加，计算KVcache的大小
         kv_size = self.total_size() * 30 * 4096 * 4 / 1024 / 1024 / 1024
-        with open('/workspace/Super_MARIO/tree_cache.txt', 'a') as f:
-            f.write(f"KVcache_size: {kv_size:.2f}GB\n")
+        #with open('/workspace/Super_MARIO/tree_cache.txt', 'a') as f:
+        #    f.write(f"KVcache_size: {kv_size:.2f}GB\n")
         #添加，讲KVcache的大小输出到/workspace/Super_MARIO/tree_cache.txt文件中
         k_size, v_size = self.token_to_kv_pool.get_kv_size_bytes()
         GB = 1024 * 1024 * 1024
         k_cache_size = k_size / GB
         v_cache_size = v_size / GB
-        with open('/workspace/Super_MARIO/tree_cache.txt', 'a') as f:
-            f.write(f"KVcache_size: {k_cache_size:.2f}GB, {v_cache_size:.2f}GB\n")
+        #with open('/workspace/Super_MARIO/tree_cache.txt', 'a') as f:
+        #    f.write(f"KVcache_size: {k_cache_size:.2f}GB, {v_cache_size:.2f}GB\n")
         #print(f"#tokens: {self.total_size()}")
 
     def total_size(self):
