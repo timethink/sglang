@@ -24,6 +24,7 @@ from typing import Dict, List, Optional, Union
 from sglang.srt.managers.schedule_batch import BaseFinishReason
 from sglang.srt.sampling.sampling_params import SamplingParams
 
+from sglang.srt.mem_cache.radix_cache import TreeNode
 
 @dataclass
 class SessionParams:
@@ -398,7 +399,7 @@ class BatchStrOut:
     output_top_logprobs_idx: List[List]
     #添加，puct_value,还有last_node
     puct_value: List[float]
-    last_node: List[
+    last_node: List[TreeNode]
 
     
 
