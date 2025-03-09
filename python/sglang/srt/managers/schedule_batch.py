@@ -234,6 +234,8 @@ class Req:
         session_id: Optional[str] = None,
         custom_logit_processor: Optional[str] = None,
         eos_token_ids: Optional[Set[int]] = None,
+        #添加puct_value，用于mcts的value计算，先取0试试
+        puct_value: float = 0.0,
     ):
         # Input and output info
         self.rid = rid
@@ -264,6 +266,9 @@ class Req:
         self.to_abort = False
         self.stream = stream
         self.eos_token_ids = eos_token_ids
+
+        # PUCT value，添加
+        self.puct_value = puct_value
 
         # For incremental decoding
         # ----- | --------- read_ids -------|

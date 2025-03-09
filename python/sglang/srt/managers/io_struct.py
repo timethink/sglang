@@ -396,6 +396,8 @@ class BatchStrOut:
     input_top_logprobs_idx: List[List]
     output_top_logprobs_val: List[List]
     output_top_logprobs_idx: List[List]
+    #添加，puct_value
+    
 
 
 @dataclass

@@ -340,6 +340,8 @@ class TokenizerManager:
                 SessionParams(**obj.session_params) if obj.session_params else None
             )
 
+        #添加，注释掉这一块
+        """
         input_token_num = len(input_ids) if input_ids is not None else 0
         if input_token_num >= self.context_len:
             raise ValueError(
@@ -361,7 +363,8 @@ class TokenizerManager:
                 f"completion. Please reduce the number of tokens in the input "
                 f"messages or the completion to fit within the limit."
             )
-
+        """
+        
         # Parse sampling parameters
         sampling_params = SamplingParams(**obj.sampling_params)
         sampling_params.normalize(self.tokenizer)

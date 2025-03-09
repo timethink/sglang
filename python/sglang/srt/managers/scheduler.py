@@ -769,7 +769,7 @@ class Scheduler:
         #将self.tree_cache.pretty_print()输出到/workspace/Super_MARIO/tree_cache.txt文件中
         #with open("/workspace/Super_MARIO/tree_cache.txt", "a") as f:
         #    f.write(self.tree_cache.pretty_print())
-        #self.tree_cache.pretty_print()
+        self.tree_cache.pretty_print()
 
         logger.info(
             f"Prefill batch. "
@@ -830,11 +830,13 @@ class Scheduler:
             f.write(f"max_fill_ids: {max_fill_ids}, kv_size: {kv_size:.2f}GB, gpu_memory_utilization: {gpu_memory_utilization}\n")
         """
         #将cache hit rate保存到/workspace/Super_MARIO/cache_hit_rate.txt文件中
+        """
         with open("/workspace/Super_MARIO/cache_hit_rate.txt", "a") as f:
             f.write(str(100.0 * tree_cache_hit_rate) + "\n")
         #将current_batch_cache_hit_rate保存到/workspace/Super_MARIO/current_batch_cache_hit_rate.txt文件中
         with open("/workspace/Super_MARIO/current_batch_cache_hit_rate.txt", "a") as f:
             f.write(str(current_batch_cache_hit_rate) + "\n")
+        """
 
         if self.enable_metrics:
             self.stats.num_running_reqs = running_bs

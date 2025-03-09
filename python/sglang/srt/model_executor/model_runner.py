@@ -558,6 +558,9 @@ class ModelRunner:
         rest_memory = available_gpu_memory - total_gpu_memory * (
             1 - self.mem_fraction_static
         )
+        print(f"rest_memory: {rest_memory}")
+        print(f"available_gpu_memory: {available_gpu_memory}")
+        print(f"total_gpu_memory: {total_gpu_memory}")
         max_num_token = int(rest_memory * (1 << 30) // cell_size)
         return max_num_token
 

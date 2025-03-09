@@ -48,7 +48,8 @@ class TreeNode:
         self.value = None
         self.lock_ref = 0
         self.last_access_time = time.time()
-
+        #添加mcts的puct_value，这里不确实是取0还是None
+        self.puct_value = 0
         self.hit_count = 0
         # indicating the node is loading KV cache from host
         self.loading = False
@@ -67,6 +68,8 @@ class TreeNode:
         return self.host_value is not None
 
     def __lt__(self, other: "TreeNode"):
+        #修改，改成根据puct_value排序
+        #return self.puct_value < other.puct_value
         return self.last_access_time < other.last_access_time
 
 
@@ -159,6 +162,9 @@ class RadixCache(BasePrefixCache):
 
         # Remove req slot release the cache lock
         self.req_to_token_pool.free(req.req_pool_idx)
+
+        #添加，修改last_node的puct_value
+        self.modify_value(req.last_node, req.puct_value)
         self.dec_lock_ref(req.last_node)
 
     def cache_unfinished_req(self, req: Req, token_ids: Optional[List[int]] = None):
@@ -262,6 +268,10 @@ class RadixCache(BasePrefixCache):
             node.lock_ref -= 1
             node = node.parent
         return delta
+    
+    #添加，用于修改node的puct_value
+    def modify_value(self, node: TreeNode, puct_value):
+        node.puct_value = puct_value
 
     def evictable_size(self):
         return self.evictable_size_
@@ -341,13 +351,18 @@ class RadixCache(BasePrefixCache):
             #添加，将内容输出到到/workspace/Super_MARIO/tree_cache.txt文件中
             #从/workspace/AlphaMath-7B获取tokenizer，讲key转换为字符串
             # 替换为模型的实际名称或路径
+            
             tokenizer = AutoTokenizer.from_pretrained("/workspace/AlphaMath-7B")
             key_str = tokenizer.decode(child.key)
+            
             with open('/workspace/Super_MARIO/tree_cache.txt', 'a') as f:
                 #f.write(" " * indent + str(len(child.key)) + " " + str(child.key[:10]) + " " + str(child.lock_ref) + "\n")
+                f.write("\n")
                 f.write(" " * indent + str(len(child.key))  + " " + key_str + " " + str(child.lock_ref) + "\n")
-                #f.write(" " * indent + str(len(child.key)) + " " + str(child.key) + " " + str(len(child.value)) + " " +str(child.value) + " " + str(child.lock_ref) + "\n")
+                #f.write(" " * indent + str(len(child.key)) + " " + str(child.key) + " " + str(len(child.value)) + " " +str(child.value) + " " + str(child.lock_ref) + " " + str(child.last_access_time) + "\n")
+                f.write("\n")
             #print(" " * indent, len(child.key), child.key[:10], f"r={child.lock_ref}")
+            
             self._print_helper(child, indent=indent + 2)
 
     def _delete_leaf(self, node):
